@@ -10,8 +10,8 @@ const getRandomNumber = function (min, max) {
 getRandomNumber(0,7);
 
 
-const hasValidLength = function (text, maxLength = 140) {
+const isValidLength = function (text, maxLength = 140) {
   return text.length <= maxLength;
 }
 
-hasValidLength('Hello world');
+isValidLength('Hello world');
