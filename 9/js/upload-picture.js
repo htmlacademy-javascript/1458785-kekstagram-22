@@ -194,6 +194,10 @@ const setEffect = function(effectClass) {
   scalePhoto.style.filter = '';
   scalePhoto.classList.add(effectClass);
 
+  const radioButtonId = effectClass.replace('s__preview-','');
+  const radio = effectsList.querySelector('#' + radioButtonId);
+  radio.checked = true;
+
   const effect = effects.getByClass(effectClass);
   if (effect) {
     const sliderOptions = effect.getSliderOptions();
@@ -227,11 +231,15 @@ const setSlider = function() {
   });
 
   effectsSlider.noUiSlider.on('update', (values, handle) => {
-    const value = values[handle];
-    effectsSliderValue.value = value;
     const effect = effects.getByClass(scalePhoto.className);
     if (effect) {
+      const value = values[handle];
+      const initial = effect.getSliderOptions().initial;
+      effectsSliderValue.value = (100*(+value)/(+initial)).toFixed(0);
       effect.set(scalePhoto, value);
+    }
+    else{
+      effectsSliderValue.value = '';
     }
   });
 };
@@ -328,4 +336,9 @@ descriptionInput.addEventListener('input', () => {
     descriptionInput.setCustomValidity('');
   }
   descriptionInput.reportValidity();
+});
+
+const buttonClick = document.querySelector('#upload-submit');
+buttonClick.addEventListener('click', function() {
+  buttonClick.focus();
 });
