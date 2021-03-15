@@ -39,50 +39,48 @@ const renderPictureList = (similarPictures) => {
   pictureContainer.appendChild(similarListFragment);
 };
 
-const onFilterClicked = _.debounce(
-  function (clickedButton) {
-    let filtered;
-    if (filterRandom === clickedButton) {
-      filtered = getRandomUniqueArrayElements(pictures, PICTURES_COUNT_RANDOM);
-    }
-    else if (filterDiscussed === clickedButton) {
-      filtered = pictures
-        .slice()
-        .sort((a, b) => b.comments.length - a.comments.length);
-    } else {
-      filtered = pictures;
-    }
+const updateFilter = _.debounce(
+  function (filter) {
+    const filtered = filter(pictures);
     renderPictureList(filtered);
   },
   RERENDER_DELAY);
 
-filterDefault.addEventListener('click', function (evt) {
-  updateFilterButtons(evt.target);
-  onFilterClicked(evt.target);
-});
-
-filterRandom.addEventListener('click', function (evt) {
-  updateFilterButtons(evt.target);
-  onFilterClicked(evt.target);
-});
-
-filterDiscussed.addEventListener('click', function (evt) {
-  updateFilterButtons(evt.target);
-  onFilterClicked(evt.target);
-});
-
-const updateFilterButtons = function (selectedButton) {
-  if (selectedButton !== filterDefault) {
+const updateFilterButtons = function (selectedFilterButton) {
+  if (selectedFilterButton !== filterDefault) {
     filterDefault.classList.remove('img-filters__button--active');
   }
-  if (selectedButton !== filterRandom) {
+  if (selectedFilterButton !== filterRandom) {
     filterRandom.classList.remove('img-filters__button--active');
   }
-  if (selectedButton !== filterDiscussed) {
+  if (selectedFilterButton !== filterDiscussed) {
     filterDiscussed.classList.remove('img-filters__button--active');
   }
-  selectedButton.classList.add('img-filters__button--active');
+  selectedFilterButton.classList.add('img-filters__button--active');
 };
+
+const getFilter = function(selectedFilterButton){
+  if (filterRandom === selectedFilterButton) {
+    return (pics) => getRandomUniqueArrayElements(pics, PICTURES_COUNT_RANDOM);
+  }
+  else if (filterDiscussed === selectedFilterButton) {
+    return (pics) => pics.slice().sort((a, b) => b.comments.length - a.comments.length);
+  }
+
+  return (pics) => pics;
+}
+
+const onFilterClicked = function(evt){
+  const clickedButton = evt.target;
+  updateFilterButtons(clickedButton);
+
+  const filter = getFilter(clickedButton);
+  updateFilter(filter);
+}
+
+filterDefault.addEventListener('click', onFilterClicked);
+filterRandom.addEventListener('click', onFilterClicked);
+filterDiscussed.addEventListener('click', onFilterClicked);
 
 const initializePicturesList = function (pics) {
   pictures.push(...pics);
